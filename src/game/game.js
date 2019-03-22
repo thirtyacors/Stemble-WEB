@@ -14,7 +14,7 @@ function launch() {
             arcade: {
                 //gravity: {y: 300},
                 debug: false
-            }
+            } // AAAAAAAAAAAAAA
         },
         scene: [BootScene, PlayScene]
     })
