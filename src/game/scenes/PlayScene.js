@@ -16,7 +16,6 @@ export default class PlayScene extends Scene {
     bomb.body.onWorldBounds = true; // enable worldbounds collision event
     bomb.setBounce(1);
     bomb.setVelocity(200, 20);
-    //Hola, què tal?
 
   }
 
