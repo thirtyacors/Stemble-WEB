@@ -89,7 +89,6 @@ export default class PlayScene extends Scene {
       });
 
     forma.angle += 0.5;
-    /*
     creu.angle += 0.5;
     creu1.angle += 0.5;
     creu_blau.angle += 0.5;
