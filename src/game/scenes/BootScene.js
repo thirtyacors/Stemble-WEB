@@ -10,7 +10,8 @@ import creu from '@/game/assets/creuv.png';
 import creub from '@/game/assets/creub.png';
 import creut from '@/game/assets/creut.png';
 import forma from '@/game/assets/forma.png';
-
+import estelap1 from '@/game/assets/estela_blava.png';
+import estelap2 from '@/game/assets/estela_vermella.png';
 
 
 export default class BootScene extends Scene {
@@ -30,6 +31,8 @@ export default class BootScene extends Scene {
         this.load.image('creub', creub);
         this.load.image('creut', creut);
         this.load.image('forma', forma);
+        this.load.image('estela_blava', estelap1)
+        this.load.image('estela_vermella', estelap2)
         // this.load.audio('thud', ['assets/thud.mp3', 'assets/thud.ogg'])
     }
 
