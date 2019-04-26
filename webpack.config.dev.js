@@ -60,6 +60,14 @@ module.exports = {
                 ]
             },
             {
+                test: /\.json$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                    }
+                ]
+            },
+            {
                 test: /\.html$/i,
                 exclude: [path.join(__dirname, "src/index.html")],
                 include: [
