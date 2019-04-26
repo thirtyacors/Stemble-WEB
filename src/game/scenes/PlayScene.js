@@ -15,6 +15,9 @@ var player2;
 var estelap2;
 var last_estelap2;
 
+//OBJECTES
+var base;
+var flag;
 // VARIABLES EDITABLES
 var max_last_estela = 5;
 var gap_estela = 0;
@@ -23,6 +26,9 @@ var max_gap = 10;
 var velocitat = 1;
 var rotacio = 0.05;
 var maxEstela = 100 - max_last_estela;
+
+var posInicialJug1 = [1105, 95];
+var posInicialJug2 = [95, 505];
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -47,16 +53,28 @@ export default class PlayScene extends Scene {
     obstacles_mapa.create(300, 157, 'creut');
     obstacles_mapa.create(600, 300, 'forma');
 
-    player1 = this.physics.add.sprite(1105, 95, 'bomb');
+    //Bases
+    base = this.physics.add.staticGroup();
+    base.create( posInicialJug2[0], posInicialJug2[1],'baseN').setScale(0.5).refreshBody().equipo = "orange";
+    base.create(posInicialJug1[0], posInicialJug1[1],'baseA').setScale(0.5).refreshBody().equipo = "blue";
+
+    //Jugadors
+    player1 = this.physics.add.sprite( posInicialJug1[0],  posInicialJug1[1], 'bomb');
     player1.name = "Player1";
+    player1.equipo = "blue";
+    player1.bandera = undefined;
+
     player1.setCollideWorldBounds(true);
     player1.body.onWorldBounds = true;
 
-    player2 = this.physics.add.sprite(95, 505, 'bomb');
+    player2 = this.physics.add.sprite( posInicialJug2[0],  posInicialJug2[1], 'bomb');
     player2.name = "Player2";
     player2.setCollideWorldBounds(true);
     player2.body.onWorldBounds = true;
     player2.rotation = Math.PI;
+
+    player2.equipo = "orange";
+    player2.bandera = undefined;
 
     keys = this.input.keyboard.addKeys({
       left: 'left',
@@ -65,6 +83,7 @@ export default class PlayScene extends Scene {
       d: 'd'
     });
 
+    //Estela
     estelap1 = this.physics.add.group();
     last_estelap1 = this.physics.add.group();
     estelap2 = this.physics.add.group();
@@ -77,6 +96,22 @@ export default class PlayScene extends Scene {
     this.physics.add.overlap(player1, last_estelap2, die, null, this);
     this.physics.add.overlap(player2, last_estelap1, die, null, this);
 
+    
+
+    //Banderas
+    flag = this.physics.add.staticGroup();
+    flag.create(posInicialJug2[0]+10, posInicialJug2[1]-50,'flagN').setScale(0.03).refreshBody().equipo = "orange";
+    flag.create(posInicialJug1[0]+10, posInicialJug1[1]-50,'flagA').setScale(0.03).refreshBody().equipo = "blue";
+
+    //Iniciar banderas
+    var flag1 = flag.getChildren()[0];
+    var flag2 = flag.getChildren()[1];
+
+    inicialitzarFlag(flag1);
+    inicialitzarFlag(flag2);
+
+    this.physics.add.overlap([player1,player2], flag, collectFlag, null, this);
+    this.physics.add.overlap([player1,player2], base, enterBase, null, this);
   }
 
   update () {
@@ -150,10 +185,55 @@ export default class PlayScene extends Scene {
     // Calcular desplaçament player2
     player2.x += velocitat * Math.sin(-player2.rotation);
     player2.y += velocitat * Math.cos(-player2.rotation);
+
+    //Moviment banderes
+    flag.children.iterate(function (child) {
+
+      if(child.follow != undefined){
+        child.x = child.follow.x+10;
+        child.y = child.follow.y-20;
+        child.refreshBody();
+      }
+    });
   }
 }
 
 function die(player)
 {
   console.log(player.name+" DIE");
+}
+
+//Si la bandera no es suya y no esta cogida, la coge
+function collectFlag(player, flag){
+  if(flag.equipo != player.equipo && flag.follow == undefined){
+      
+    flag.cogida = true;
+    flag.follow = player;
+    player.bandera = flag;
+  }
+}
+
+//Si la base es suya y tiene una bandera +10 puntos
+function enterBase(player, base){
+  if(base.equipo == player.equipo && player.bandera != undefined){
+     if(player.equipo == "blue"){
+       //count2 +=10;
+       //text2.setText(count2);
+     }
+     else if(player.equipo == "orange"){
+      //count1+=10;
+      //text1.setText(count1);
+    }
+    player.bandera.reset();
+    player.bandera = undefined;
+
+  }
+}
+//Inicialitza els atributs de la bandera
+function inicialitzarFlag(flag){
+    flag.posInicialX = flag.x;
+    flag.posInicialY = flag.y;
+    var res = function(){this.x = this.posInicialX;this.y = this.posInicialY;this.refreshBody();this.follow = undefined;};
+    flag.reset = res;
+    flag.follow = undefined;
 }
