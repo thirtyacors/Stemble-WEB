@@ -5,7 +5,6 @@ var keys;
 
 // MAPA
 var obstacles_mapa;
-
 // JUGADORS
 var player1;
 var estelap1;
@@ -22,7 +21,7 @@ var max_gap = 10;
 
 var velocitat = 1;
 var rotacio = 0.05;
-var maxEstela = 100 - max_last_estela;
+var maxEstela = 20 - max_last_estela;
 
 export default class PlayScene extends Scene {
   constructor () {
