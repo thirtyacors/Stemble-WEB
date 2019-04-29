@@ -5,6 +5,7 @@ var keys;
 
 // MAPA
 var obstacles_mapa;
+
 // JUGADORS
 var player1;
 var estelap1;
@@ -17,17 +18,20 @@ var last_estelap2;
 //OBJECTES
 var base;
 var flag;
-// VARIABLES EDITABLES
-var max_last_estela = 5;
+
+// ESTELA
 var gap_estela = 0;
-var max_gap = 10;
 
-var velocitat = 1;
-var rotacio = 0.05;
-var maxEstela = 20 - max_last_estela;
+// VARIABLES EDITABLES
+var velocitat = 2; // velocitat players
+var rotacio = 0.05; // rotacio players
 
-var posInicialJug1 = [1105, 95];
-var posInicialJug2 = [95, 505];
+var max_last_estela = 5; // esteles que no toquen el player
+var maxEstela = 20 - max_last_estela; // maxim nombre de esteles
+var max_gap = 5; // cada quant surten les esteles
+
+var posInicialJug1 = [1105, 95]; // pos inicial player1
+var posInicialJug2 = [95, 505]; // pos inicial player2
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -95,8 +99,6 @@ export default class PlayScene extends Scene {
     this.physics.add.overlap(player1, last_estelap2, die, null, this);
     this.physics.add.overlap(player2, last_estelap1, die, null, this);
 
-    
-
     //Banderas
     flag = this.physics.add.staticGroup();
     flag.create(posInicialJug2[0]+10, posInicialJug2[1]-50,'flagN').setScale(0.03).refreshBody().equipo = "orange";
@@ -114,12 +116,6 @@ export default class PlayScene extends Scene {
   }
 
   update () {
-    /*
-    this.physics.world.collide([player1,player2], [barrera1, barrera2, barrera3, barrera4, barrera5, barrera6, barrera_colors1, barrera_colors2, creu, creu_taronja, creu_blau,
-      creu1, creu_taronja1, creu_blau1, forma], function(){
-            console.log("1");
-      });
-    */
 
     // MAPA
     for (var i = 6; i < obstacles_mapa.getChildren().length; i++)
@@ -166,7 +162,7 @@ export default class PlayScene extends Scene {
     else
       gap_estela++;
 
-    // APLICAR MOVIMENT AUTOMATIC
+  // APLICAR MOVIMENT AUTOMATIC
     // CONTROLS player1
     if (keys.left.isDown)
       player1.rotation -= rotacio;
