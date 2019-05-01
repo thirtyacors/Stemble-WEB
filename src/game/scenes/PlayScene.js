@@ -19,16 +19,13 @@ var last_estelap2;
 var base;
 var flag;
 
-// ESTELA
-var gap_estela = 0;
-
-// VARIABLES EDITABLES
-var velocitat = 2; // velocitat players
+// VARIABLES EDITABLES //////////////////////////////////////////////////////////////////////////
+var velocitat = 3; // velocitat players
 var rotacio = 0.05; // rotacio players
 
 var max_last_estela = 5; // esteles que no toquen el player
 var maxEstela = 20 - max_last_estela; // maxim nombre de esteles
-var max_gap = 5; // cada quant surten les esteles
+var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor entre velocitat)
 
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
@@ -68,10 +65,10 @@ export default class PlayScene extends Scene {
     player1.name = "Player1";
     player1.equipo = "blue";
 	player1.velocitat = velocitat;
+	player1.maxEstela = maxEstela;
+	player1.max_gap = max_gap / player1.velocitat;
+	player1.gap_estela = 0;
     player1.bandera = undefined;
-
-    //player1.setCollideWorldBounds(true);
-    //player1.body.onWorldBounds = true;
 
     player2 = this.physics.add.sprite( posInicialJug2[0],  posInicialJug2[1], 'bomb');
 	player2.inici = posInicialJug2;
@@ -79,11 +76,11 @@ export default class PlayScene extends Scene {
     player2.name = "Player2";
 	player2.equipo = "orange";
 	player2.velocitat = velocitat;
+	player2.maxEstela = maxEstela;
+	player2.max_gap = max_gap / player2.velocitat;
+	player2.gap_estela = 0;
 	player2.bandera = undefined;
 	player2.rotation = Math.PI;
-	
-    //player2.setCollideWorldBounds(true);
-    //player2.body.onWorldBounds = true;
 
     keys = this.input.keyboard.addKeys({
       left: 'left',
@@ -134,46 +131,50 @@ export default class PlayScene extends Scene {
 	*/
 
     // JUGADORS
-    if (gap_estela >= max_gap) {
-      // CREEM ESTELA P1
-	  if(player1.active)
-	  {
-		  if (estelap1.getChildren().length < maxEstela)
-			last_estelap1.create(player1.x,player1.y,'estela_blava');
-		  else {
-			last_estelap1.add(estelap1.getChildren()[0]);
-			estelap1.remove(estelap1.getChildren()[0]);
-			last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].x = player1.x;
-			last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].y = player1.y;
-		  }
-		  last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].rotation = player1.rotation;
+    if (player1.gap_estela >= player1.max_gap) {
+        // CREEM ESTELA P1
+        if (player1.active) {
+            if (estelap1.getChildren().length < player1.maxEstela)
+                last_estelap1.create(player1.x, player1.y, 'estela_blava');
+            else {
+                last_estelap1.add(estelap1.getChildren()[0]);
+                estelap1.remove(estelap1.getChildren()[0]);
+                last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].x = player1.x;
+                last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].y = player1.y;
+            }
+            last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].rotation = player1.rotation;
 
-		  if (last_estelap1.getChildren().length >= max_last_estela)
-		  {
-			estelap1.add(last_estelap1.getChildren()[0]);
-			last_estelap1.remove(last_estelap1.getChildren()[0]);
-		  }
-	  }
-	  else
-	  {
-		  // borrem estela
-		  if (estelap1.getChildren().length > 0) estelap1.getChildren()[0].destroy();
-		  else if (last_estelap1.getChildren().length > 0) last_estelap1.getChildren()[0].destroy();
-		  else
-		  {
-				player1.active = true;
-				player1.visible = true;
-				player1.velocitat = velocitat;
-				player1.x = player1.inici[0];
-				player1.y = player1.inici[1];
-				player1.rotation = 0;
-		  }
-	  }
+            if (last_estelap1.getChildren().length >= max_last_estela) {
+                estelap1.add(last_estelap1.getChildren()[0]);
+                last_estelap1.remove(last_estelap1.getChildren()[0]);
+            }
+        } else {
+            // borrem estela
+            if (estelap1.getChildren().length > 0) estelap1.getChildren()[0].destroy();
+            else if (last_estelap1.getChildren().length > 0) last_estelap1.getChildren()[0].destroy();
+            else {
+                player1.active = true;
+                player1.visible = true;
+                player1.velocitat = velocitat;
+                player1.maxEstela = maxEstela;
+                player1.max_gap = max_gap / player1.velocitat;
+                //player1.gap_estela = 0;
+                player1.x = player1.inici[0];
+                player1.y = player1.inici[1];
+                player1.rotation = 0;
+            }
+        }
 
+        player1.gap_estela = 0;
+    }
+    else
+        player1.gap_estela++;
+
+    if (player2.gap_estela >= player2.max_gap) {
       // CREEM ESTELA P2
 	  if(player2.active)
 	  {
-		  if (estelap2.getChildren().length < maxEstela)
+		  if (estelap2.getChildren().length < player2.maxEstela)
 			last_estelap2.create(player2.x,player2.y,'estela_vermella');
 		  else {
 			last_estelap2.add(estelap2.getChildren()[0]);
@@ -199,16 +200,18 @@ export default class PlayScene extends Scene {
 				player2.active = true;
 				player2.visible = true;
 				player2.velocitat = velocitat;
+                player2.maxEstela = maxEstela;
+                player2.max_gap = max_gap / player2.velocitat;
+                //player2.gap_estela = 0;
 				player2.x = player2.inici[0];
 				player2.y = player2.inici[1];
 				player2.rotation = Math.PI;
 		  }
 	  }
-	  
-      gap_estela = 0;
+        player2.gap_estela = 0;
     }
     else
-      gap_estela++;
+        player2.gap_estela++;
 
   // APLICAR MOVIMENT AUTOMATIC
     // CONTROLS player1
