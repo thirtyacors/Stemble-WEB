@@ -1,24 +1,5 @@
 import { Scene } from 'phaser';
 
-// CONTROLS
-var keys;
-
-// MAPA
-var obstacles_mapa;
-
-// JUGADORS
-var player1;
-var estelap1;
-var last_estelap1;
-
-var player2;
-var estelap2;
-var last_estelap2;
-
-//OBJECTES
-var base;
-var flag;
-
 // VARIABLES EDITABLES //////////////////////////////////////////////////////////////////////////
 var velocitat = 3; // velocitat players
 var rotacio = 0.05; // rotacio players
@@ -29,6 +10,29 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
+
+// VARIABLES NO EDITABLES //////////////////////////////////////////////////////////////////////////
+ // CONTROLS
+var keys;
+
+ // MAPA
+var obstacles_mapa;
+
+ // JUGADORS
+var player1;
+var estelap1;
+var last_estelap1;
+
+var player2;
+var estelap2;
+var last_estelap2;
+
+ //OBJECTES
+var base;
+var flag;
+
+ // Textos
+var textos;
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -53,17 +57,33 @@ export default class PlayScene extends Scene {
     obstacles_mapa.create(300, 157, 'creut');
     obstacles_mapa.create(600, 300, 'forma');
 
+    textos = {
+        equip_blau: this.add.text(1092, 480, '0').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
+        equip_taronja: this.add.text(84, 71, '0').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
+        temps: this.add.text(562, 276, '120').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1)
+    };
+
+    // Equips
+    var equip_blau = {
+        color: "blue",
+        puntuacio: 0
+    };
+    var equip_taronja = {
+        color: "orange",
+        puntuacio: 0,
+    };
+
     //Bases
     base = this.physics.add.staticGroup();
-    base.create( posInicialJug2[0], posInicialJug2[1],'baseN').setScale(0.5).refreshBody().equipo = "orange";
-    base.create(posInicialJug1[0], posInicialJug1[1],'baseA').setScale(0.5).refreshBody().equipo = "blue";
+    base.create( posInicialJug2[0], posInicialJug2[1],'baseN').setScale(0.5).refreshBody().equipo = equip_taronja;
+    base.create( posInicialJug1[0], posInicialJug1[1],'baseA').setScale(0.5).refreshBody().equipo = equip_blau;
 
     //Jugadors
     player1 = this.physics.add.sprite( posInicialJug1[0],  posInicialJug1[1], 'bomb');
 	player1.inici = posInicialJug1;
-	player1.depth = 1;
+	player1.depth = 11;
     player1.name = "Player1";
-    player1.equipo = "blue";
+    player1.equipo = equip_blau;
 	player1.velocitat = velocitat;
 	player1.maxEstela = maxEstela;
 	player1.max_gap = max_gap / player1.velocitat;
@@ -72,9 +92,9 @@ export default class PlayScene extends Scene {
 
     player2 = this.physics.add.sprite( posInicialJug2[0],  posInicialJug2[1], 'bomb');
 	player2.inici = posInicialJug2;
-	player2.depth = 1;
+	player2.depth = 11;
     player2.name = "Player2";
-	player2.equipo = "orange";
+    player2.equipo = equip_taronja;
 	player2.velocitat = velocitat;
 	player2.maxEstela = maxEstela;
 	player2.max_gap = max_gap / player2.velocitat;
@@ -104,14 +124,14 @@ export default class PlayScene extends Scene {
 
     //Banderas
     flag = this.physics.add.staticGroup();
-    flag.create(posInicialJug2[0]+10, posInicialJug2[1]-50,'flagN').setScale(0.03).refreshBody().equipo = "orange";
-    flag.create(posInicialJug1[0]+10, posInicialJug1[1]-50,'flagA').setScale(0.03).refreshBody().equipo = "blue";
+    flag.create(posInicialJug2[0]+10, posInicialJug2[1]-50,'flagN').setScale(0.03).refreshBody().equipo = equip_taronja;
+    flag.create(posInicialJug1[0]+10, posInicialJug1[1]-50,'flagA').setScale(0.03).refreshBody().equipo = equip_blau;
 
     //Iniciar banderas
     var flag1 = flag.getChildren()[0];
-	flag1.depth = 2;
+	flag1.depth = 12;
     var flag2 = flag.getChildren()[1];
-	flag2.depth = 2;
+	flag2.depth = 12;
 
     inicialitzarFlag(flag1);
     inicialitzarFlag(flag2);
@@ -134,8 +154,10 @@ export default class PlayScene extends Scene {
     if (player1.gap_estela >= player1.max_gap) {
         // CREEM ESTELA P1
         if (player1.active) {
-            if (estelap1.getChildren().length < player1.maxEstela)
-                last_estelap1.create(player1.x, player1.y, 'estela_blava');
+            if (estelap1.getChildren().length < player1.maxEstela) {
+                last_estelap1.create(player1.x, player1.y, 'estela_blava').setDepth(10);
+                last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].parent = player1;
+            }
             else {
                 last_estelap1.add(estelap1.getChildren()[0]);
                 estelap1.remove(estelap1.getChildren()[0]);
@@ -158,7 +180,6 @@ export default class PlayScene extends Scene {
                 player1.velocitat = velocitat;
                 player1.maxEstela = maxEstela;
                 player1.max_gap = max_gap / player1.velocitat;
-                //player1.gap_estela = 0;
                 player1.x = player1.inici[0];
                 player1.y = player1.inici[1];
                 player1.rotation = 0;
@@ -174,8 +195,10 @@ export default class PlayScene extends Scene {
       // CREEM ESTELA P2
 	  if(player2.active)
 	  {
-		  if (estelap2.getChildren().length < player2.maxEstela)
-			last_estelap2.create(player2.x,player2.y,'estela_vermella');
+		  if (estelap2.getChildren().length < player2.maxEstela) {
+              last_estelap2.create(player2.x, player2.y, 'estela_vermella').setDepth(10);
+              last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].parent = player2;
+          }
 		  else {
 			last_estelap2.add(estelap2.getChildren()[0]);
 			estelap2.remove(estelap2.getChildren()[0]);
@@ -202,7 +225,6 @@ export default class PlayScene extends Scene {
 				player2.velocitat = velocitat;
                 player2.maxEstela = maxEstela;
                 player2.max_gap = max_gap / player2.velocitat;
-                //player2.gap_estela = 0;
 				player2.x = player2.inici[0];
 				player2.y = player2.inici[1];
 				player2.rotation = Math.PI;
@@ -248,15 +270,31 @@ function die(player, collision)
 {
 	if (player.active)
 	{
+	    if (player.bandera !== undefined) {
+            player.bandera.reset();
+            player.bandera = undefined;
+        }
 		player.active = false;
 		player.visible = false;
 		player.velocitat = 0;
+
+		// SUMAR PUNTUACIO
+        if (collision.parent && collision.parent.equipo) {console.log(collision.parent.equipo);
+            collision.parent.equipo.puntuacio += 1;
+            if (collision.parent.equipo.color == "blue") {
+                textos.equip_blau.setText(collision.parent.equipo.puntuacio);
+                if (collision.parent.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
+            } else if (collision.parent.equipo.color == "orange") {
+                textos.equip_taronja.setText(collision.parent.equipo.puntuacio);
+                if (collision.parent.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
+            }
+        }
 	}
 }
 
 //Si la bandera no es suya y no esta cogida, la coge
 function collectFlag(player, flag){
-  if(flag.equipo != player.equipo && flag.follow == undefined){
+  if(flag.equipo.color != player.equipo.color && flag.follow == undefined){
       
     flag.cogida = true;
     flag.follow = player;
@@ -266,15 +304,17 @@ function collectFlag(player, flag){
 
 //Si la base es suya y tiene una bandera +10 puntos
 function enterBase(player, base){
-  if(base.equipo == player.equipo && player.bandera != undefined){
-     if(player.equipo == "blue"){
-       //count2 +=10;
-       //text2.setText(count2);
-     }
-     else if(player.equipo == "orange"){
-      //count1+=10;
-      //text1.setText(count1);
-    }
+  if(base.equipo.color == player.equipo.color && player.bandera != undefined){
+      player.equipo.puntuacio += 10;
+      if(player.equipo.color == "blue") {
+          textos.equip_blau.setText(player.equipo.puntuacio);
+          if (player.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
+      }
+      else if(player.equipo.color == "orange") {
+          textos.equip_taronja.setText(player.equipo.puntuacio);
+          if (player.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
+      }
+
     player.bandera.reset();
     player.bandera = undefined;
 
