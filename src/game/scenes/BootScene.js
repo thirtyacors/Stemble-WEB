@@ -16,6 +16,15 @@ import flagN from '@/game/assets/flago.png';
 import flagA from '@/game/assets/flagb.png';
 import baseA from '@/game/assets/baseA.png';
 import baseN from '@/game/assets/baseN.png';
+import pwc1 from '@/game/assets/pwc1.png';
+import pwc2 from '@/game/assets/pwc2.png';
+import pwc3 from '@/game/assets/pwc3.png';
+import pwc0 from '@/game/assets/pwc0.png';
+import pw1 from '@/game/assets/pw1.png';
+import pw2 from '@/game/assets/pw2.png';
+import pw3 from '@/game/assets/pw3.png';
+import pocket from '@/game/assets/pocket.png';
+import bombE from '@/game/assets/bombE.png';
 
 export default class BootScene extends Scene {
     constructor() {
@@ -40,6 +49,15 @@ export default class BootScene extends Scene {
         this.load.image('flagA', flagA)
         this.load.image('baseA', baseA)
         this.load.image('baseN', baseN)
+        this.load.image('pw1', pw1)
+        this.load.image('pw2', pw2)
+        this.load.image('pw3', pw3)
+        this.load.image('pwc1', pwc1)
+        this.load.image('pwc2', pwc2)
+        this.load.image('pwc3', pwc3)
+        this.load.image('pwc0', pwc0)
+        this.load.image('pocket', pocket)
+        this.load.image('bombE', bombE)
         // this.load.audio('thud', ['assets/thud.mp3', 'assets/thud.ogg'])
     }
 

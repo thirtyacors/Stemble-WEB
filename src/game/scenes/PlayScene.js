@@ -11,6 +11,12 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
+var posPowerJug1 = [50,550];
+var posPowerJug2 = [1150,550];
+
+var temps = 3;
+var scene;
+
 // VARIABLES NO EDITABLES //////////////////////////////////////////////////////////////////////////
  // CONTROLS
 var keys;
@@ -31,8 +37,16 @@ var last_estelap2;
 var base;
 var flag;
 
+
  // Textos
 var textos;
+
+//PowerUPs
+var power1, power2;
+var bonificacio;
+
+//Interficie
+var timerTemps;
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -40,6 +54,7 @@ export default class PlayScene extends Scene {
   }
 
   create () {
+    scene =  this;
     this.add.image(600, 300, 'sky');
 
     obstacles_mapa = this.physics.add.group();
@@ -60,9 +75,16 @@ export default class PlayScene extends Scene {
     textos = {
         equip_blau: this.add.text(1092, 480, '0').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
         equip_taronja: this.add.text(84, 71, '0').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
-        temps: this.add.text(562, 276, '120').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1)
+        temps: this.add.text(562, 276, temps).setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1)
     };
 
+    //Timer 
+    timerTemps = this.time.addEvent({
+      delay: 1000,                // ms
+      callback: onTemps,
+      //args: [],
+      loop: true
+    });
     // Equips
     var equip_blau = {
         color: "blue",
@@ -80,31 +102,38 @@ export default class PlayScene extends Scene {
 
     //Jugadors
     player1 = this.physics.add.sprite( posInicialJug1[0],  posInicialJug1[1], 'bomb');
-	player1.inici = posInicialJug1;
-	player1.depth = 11;
+    player1.setCollideWorldBounds(true).body.onWorldBounds = true;
+    player1.inici = posInicialJug1;
+    player1.depth = 11;
     player1.name = "Player1";
     player1.equipo = equip_blau;
-	player1.velocitat = velocitat;
-	player1.maxEstela = maxEstela;
-	player1.max_gap = max_gap / player1.velocitat;
-	player1.gap_estela = 0;
+    player1.velocitat = velocitat;
+    player1.maxEstela = maxEstela;
+    player1.max_gap = max_gap / player1.velocitat;
+    player1.gap_estela = 0;
     player1.bandera = undefined;
+    player1.power = undefined;
+
 
     player2 = this.physics.add.sprite( posInicialJug2[0],  posInicialJug2[1], 'bomb');
-	player2.inici = posInicialJug2;
-	player2.depth = 11;
+    player2.setCollideWorldBounds(true).body.onWorldBounds = true;
+    player2.inici = posInicialJug2;
+    player2.depth = 11;
     player2.name = "Player2";
     player2.equipo = equip_taronja;
-	player2.velocitat = velocitat;
-	player2.maxEstela = maxEstela;
-	player2.max_gap = max_gap / player2.velocitat;
-	player2.gap_estela = 0;
-	player2.bandera = undefined;
-	player2.rotation = Math.PI;
+    player2.velocitat = velocitat;
+    player2.maxEstela = maxEstela;
+    player2.max_gap = max_gap / player2.velocitat;
+    player2.gap_estela = 0;
+    player2.bandera = undefined;
+    player2.power = undefined;
+    player2.rotation = Math.PI;
 
     keys = this.input.keyboard.addKeys({
       left: 'left',
       right: 'right',
+      up:'up',
+      w:'w',
       a: 'a',
       d: 'd'
     });
@@ -138,6 +167,23 @@ export default class PlayScene extends Scene {
 
     this.physics.add.overlap([player1,player2], flag, collectFlag, null, this);
     this.physics.add.overlap([player1,player2], base, enterBase, null, this);
+
+    //PowerUP Interficie
+    this.add.image(posPowerJug1[0],posPowerJug1[1], 'pocket').setScale(0.1).tint = 0xEDA862;;
+    this.add.image(posPowerJug2[0],posPowerJug2[1], 'pocket').setScale(0.1);
+    power1 = this.add.image(posPowerJug1[0],posPowerJug1[1], 'pwc0').setScale(0.1);
+    power2 = this.add.image(posPowerJug2[0],posPowerJug2[1], 'pwc0').setScale(0.1);
+
+    player1.socket = power2;
+    player2.socket = power1;
+
+    //PowerUps
+    bonificacio = this.physics.add.staticGroup();
+    bonificacio.create(400,450,'pw1').setScale(0.03).refreshBody().text = "pwc1"; //Escut
+    bonificacio.create(300,350,'pw2').setScale(0.03).refreshBody().text = "pwc2"; //Velocitat
+    bonificacio.create(500,350,'pw3').setScale(0.03).refreshBody().text = "pwc3"; //Estela
+
+    this.physics.add.overlap([player1,player2], bonificacio ,getPower, null, this);
   }
 
   update () {
@@ -183,6 +229,7 @@ export default class PlayScene extends Scene {
                 player1.x = player1.inici[0];
                 player1.y = player1.inici[1];
                 player1.rotation = 0;
+                posarInmune(player1);
             }
         }
 
@@ -227,7 +274,8 @@ export default class PlayScene extends Scene {
                 player2.max_gap = max_gap / player2.velocitat;
 				player2.x = player2.inici[0];
 				player2.y = player2.inici[1];
-				player2.rotation = Math.PI;
+        player2.rotation = Math.PI;
+        posarInmune(player2);
 		  }
 	  }
         player2.gap_estela = 0;
@@ -241,11 +289,17 @@ export default class PlayScene extends Scene {
       player1.rotation -= rotacio;
     else if (keys.right.isDown)
       player1.rotation += rotacio;
+
+    if(keys.left.isDown)
+      usePower(player1)
     // CONTROLS player2
     if (keys.a.isDown)
       player2.rotation -= rotacio;
     else if (keys.d.isDown)
       player2.rotation += rotacio;
+
+    if(keys.w.isDown)
+      usePower(player2)
 
     // Calcular desplaçament player1
     player1.x += player1.velocitat * Math.sin(-player1.rotation);
@@ -266,32 +320,96 @@ export default class PlayScene extends Scene {
   }
 }
 
+function onTemps(){
+  temps--;
+  textos.temps.setText(temps);
+  if(temps <= 0) {
+    scene.scene.start('EndScene')
+  }
+}
+
+////// POWER UPS /////
+function getPower(player, boni){
+  if(player.power == undefined){
+    player.power = boni.text;
+    player.socket.setTexture(player.power);
+    boni.destroy();
+  }
+}
+
+function usePower(player){
+  if(player.power != undefined && !player.powerActivat){
+    switch(player.power){
+      case "pwc1":
+        player.escut = true;
+        player.setTexture("bombE");
+        break;
+      case "pwc2":
+        player.velocitat += 2
+        player.timer = scene.time.delayedCall(3000, desactivarPower,[player]);
+        break;
+      case "pwc3":
+        player.maxEstela += 10
+        break;
+    }
+    player.powerActivat = true
+    player.power = undefined;
+    player.socket.setTexture('pwc0');
+  }
+} 
+
+function desactivarPower(player){
+  player.velocitat-=2
+  player.powerActivat = false;
+}
+
 function die(player, collision)
 {
 	if (player.active)
 	{
-	    if (player.bandera !== undefined) {
-            player.bandera.reset();
-            player.bandera = undefined;
+    if(!player.escut && !player.inmune || collision == obstacles_mapa)
+    {
+      player.powerActivat = false
+        if (player.bandera !== undefined) {
+              player.bandera.reset();
+              player.bandera = undefined;
         }
-		player.active = false;
-		player.visible = false;
-		player.velocitat = 0;
+      player.power = undefined;
+      player.socket.setTexture('pwc0');
+      player.active = false;
+      player.visible = false;
+      player.velocitat = 0;
 
-		// SUMAR PUNTUACIO
-        if (collision.parent && collision.parent.equipo) {console.log(collision.parent.equipo);
-            collision.parent.equipo.puntuacio += 1;
-            if (collision.parent.equipo.color == "blue") {
-                textos.equip_blau.setText(collision.parent.equipo.puntuacio);
-                if (collision.parent.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
-            } else if (collision.parent.equipo.color == "orange") {
-                textos.equip_taronja.setText(collision.parent.equipo.puntuacio);
-                if (collision.parent.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
-            }
-        }
-	}
+      // SUMAR PUNTUACIO
+          if (collision.parent && collision.parent.equipo) {console.log(collision.parent.equipo);
+              collision.parent.equipo.puntuacio += 1;
+              if (collision.parent.equipo.color == "blue") {
+                  textos.equip_blau.setText(collision.parent.equipo.puntuacio);
+                  if (collision.parent.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
+              } else if (collision.parent.equipo.color == "orange") {
+                  textos.equip_taronja.setText(collision.parent.equipo.puntuacio);
+                  if (collision.parent.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
+              }
+          }
+    }
+    else
+    {
+      player.escut = false;
+      player.setTexture("bomb");
+      player.powerActivat = false;
+      posarInmune(player);
+    }
+  }
 }
 
+function posarInmune(player){
+  player.inmune = true;
+  player.timer = scene.time.delayedCall(1000, treureInmune,[player]);
+}
+
+function treureInmune(player){
+  player.inmune = false;
+}
 //Si la bandera no es suya y no esta cogida, la coge
 function collectFlag(player, flag){
   if(flag.equipo.color != player.equipo.color && flag.follow == undefined){
