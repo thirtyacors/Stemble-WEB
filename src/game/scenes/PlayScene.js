@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 
 // VARIABLES EDITABLES //////////////////////////////////////////////////////////////////////////
-var velocitat = 3; // velocitat players
+var velocitat = 2; // velocitat players
 var rotacio = 0.05; // rotacio players
 
 var max_last_estela = 5; // esteles que no toquen el player
@@ -11,10 +11,7 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
-var posPowerJug1 = [50,550];
-var posPowerJug2 = [1150,550];
-
-var temps = 3;
+var temps = 300;
 var scene;
 
 // VARIABLES NO EDITABLES //////////////////////////////////////////////////////////////////////////
@@ -23,6 +20,10 @@ var keys;
 
  // MAPA
 var obstacles_mapa;
+
+ // EQUIPS
+var equip_blau;
+var equip_taronja;
 
  // JUGADORS
 var player1;
@@ -37,15 +38,13 @@ var last_estelap2;
 var base;
 var flag;
 
-
  // Textos
 var textos;
 
-//PowerUPs
-var power1, power2;
+ //PowerUPs
 var bonificacio;
 
-//Interficie
+ //Interficie
 var timerTemps;
 
 export default class PlayScene extends Scene {
@@ -54,7 +53,7 @@ export default class PlayScene extends Scene {
   }
 
   create () {
-    scene =  this;
+    scene = this;
     this.add.image(600, 300, 'sky');
 
     obstacles_mapa = this.physics.add.group();
@@ -85,12 +84,13 @@ export default class PlayScene extends Scene {
       //args: [],
       loop: true
     });
+
     // Equips
-    var equip_blau = {
+    equip_blau = {
         color: "blue",
         puntuacio: 0
     };
-    var equip_taronja = {
+    equip_taronja = {
         color: "orange",
         puntuacio: 0,
     };
@@ -113,7 +113,6 @@ export default class PlayScene extends Scene {
     player1.gap_estela = 0;
     player1.bandera = undefined;
     player1.power = undefined;
-
 
     player2 = this.physics.add.sprite( posInicialJug2[0],  posInicialJug2[1], 'bomb');
     player2.setCollideWorldBounds(true).body.onWorldBounds = true;
@@ -167,15 +166,6 @@ export default class PlayScene extends Scene {
 
     this.physics.add.overlap([player1,player2], flag, collectFlag, null, this);
     this.physics.add.overlap([player1,player2], base, enterBase, null, this);
-
-    //PowerUP Interficie
-    this.add.image(posPowerJug1[0],posPowerJug1[1], 'pocket').setScale(0.1).tint = 0xEDA862;;
-    this.add.image(posPowerJug2[0],posPowerJug2[1], 'pocket').setScale(0.1);
-    power1 = this.add.image(posPowerJug1[0],posPowerJug1[1], 'pwc0').setScale(0.1);
-    power2 = this.add.image(posPowerJug2[0],posPowerJug2[1], 'pwc0').setScale(0.1);
-
-    player1.socket = power2;
-    player2.socket = power1;
 
     //PowerUps
     bonificacio = this.physics.add.staticGroup();
@@ -274,8 +264,8 @@ export default class PlayScene extends Scene {
                 player2.max_gap = max_gap / player2.velocitat;
 				player2.x = player2.inici[0];
 				player2.y = player2.inici[1];
-        player2.rotation = Math.PI;
-        posarInmune(player2);
+                player2.rotation = Math.PI;
+                posarInmune(player2);
 		  }
 	  }
         player2.gap_estela = 0;
@@ -291,7 +281,8 @@ export default class PlayScene extends Scene {
       player1.rotation += rotacio;
 
     if(keys.left.isDown)
-      usePower(player1)
+      usePower(player1);
+
     // CONTROLS player2
     if (keys.a.isDown)
       player2.rotation -= rotacio;
@@ -299,19 +290,28 @@ export default class PlayScene extends Scene {
       player2.rotation += rotacio;
 
     if(keys.w.isDown)
-      usePower(player2)
+      usePower(player2);
 
     // Calcular desplaçament player1
     player1.x += player1.velocitat * Math.sin(-player1.rotation);
     player1.y += player1.velocitat * Math.cos(-player1.rotation);
+    if (player1.aura !== undefined)
+    {
+        player1.aura.x = player1.x;
+        player1.aura.y = player1.y;
+    }
     // Calcular desplaçament player2
     player2.x += player2.velocitat * Math.sin(-player2.rotation);
     player2.y += player2.velocitat * Math.cos(-player2.rotation);
+    if (player2.aura !== undefined)
+    {
+        player2.aura.x = player2.x;
+        player2.aura.y = player2.y;
+    }
 
     //Moviment banderes
     flag.children.iterate(function (child) {
-
-      if(child.follow != undefined){
+      if(child.follow !== undefined){
         child.x = child.follow.x+10;
         child.y = child.follow.y-20;
         child.refreshBody();
@@ -330,76 +330,84 @@ function onTemps(){
 
 ////// POWER UPS /////
 function getPower(player, boni){
-  if(player.power == undefined){
+  if(player.power === undefined){
     player.power = boni.text;
-    player.socket.setTexture(player.power);
+    player.aura = this.add.image(player.x,player.y, 'aura_'+player.power).setDepth(9);
     boni.destroy();
   }
 }
 
 function usePower(player){
-  if(player.power != undefined && !player.powerActivat){
+  if(player.power !== undefined && !player.powerActivat){
     switch(player.power){
       case "pwc1":
         player.escut = true;
         player.setTexture("bombE");
+        player.powerActivat = true;
         break;
       case "pwc2":
-        player.velocitat += 2
+        player.velocitat += 2;
+        player.max_gap = max_gap / player.velocitat;
         player.timer = scene.time.delayedCall(3000, desactivarPower,[player]);
+        player.powerActivat = true;
         break;
       case "pwc3":
-        player.maxEstela += 10
+        player.maxEstela += 10;
         break;
     }
-    player.powerActivat = true
     player.power = undefined;
-    player.socket.setTexture('pwc0');
+    player.aura.destroy();
+    player.aura = undefined;
   }
 } 
 
 function desactivarPower(player){
-  player.velocitat-=2
+  if (player.velocitat > 2) player.velocitat-=2;
   player.powerActivat = false;
 }
 
 function die(player, collision)
 {
-	if (player.active)
+    if (player.active)
 	{
-    if(!player.escut && !player.inmune || collision == obstacles_mapa)
-    {
-      player.powerActivat = false
-        if (player.bandera !== undefined) {
-              player.bandera.reset();
-              player.bandera = undefined;
-        }
-      player.power = undefined;
-      player.socket.setTexture('pwc0');
-      player.active = false;
-      player.visible = false;
-      player.velocitat = 0;
-
-      // SUMAR PUNTUACIO
-          if (collision.parent && collision.parent.equipo) {console.log(collision.parent.equipo);
-              collision.parent.equipo.puntuacio += 1;
-              if (collision.parent.equipo.color == "blue") {
-                  textos.equip_blau.setText(collision.parent.equipo.puntuacio);
-                  if (collision.parent.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
-              } else if (collision.parent.equipo.color == "orange") {
-                  textos.equip_taronja.setText(collision.parent.equipo.puntuacio);
-                  if (collision.parent.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
-              }
+        if(!player.escut && !player.inmune || !collision.parent)
+        {
+          player.powerActivat = false;
+            if (player.bandera !== undefined) {
+                  player.bandera.reset();
+                  player.bandera = undefined;
+            }
+          player.power = undefined;
+          //player.socket.setTexture('pwc0');
+          if (player.aura !== undefined)
+          {
+              player.aura.destroy();
+              player.aura = undefined;
           }
-    }
-    else
-    {
-      player.escut = false;
-      player.setTexture("bomb");
-      player.powerActivat = false;
-      posarInmune(player);
-    }
-  }
+          player.active = false;
+          player.visible = false;
+          player.velocitat = 0;
+
+          // SUMAR PUNTUACIO
+              if (collision.parent && collision.parent.equipo !== player.equipo) {console.log(collision.parent.equipo);
+                  collision.parent.equipo.puntuacio += 1;
+                  if (collision.parent.equipo.color === "blue") {
+                      textos.equip_blau.setText(collision.parent.equipo.puntuacio);
+                      if (collision.parent.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
+                  } else if (collision.parent.equipo.color === "orange") {
+                      textos.equip_taronja.setText(collision.parent.equipo.puntuacio);
+                      if (collision.parent.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
+                  }
+              }
+        }
+        else
+        {
+          player.escut = false;
+          player.setTexture("bomb");
+          player.powerActivat = false;
+          posarInmune(player);
+        }
+	}
 }
 
 function posarInmune(player){
@@ -412,7 +420,7 @@ function treureInmune(player){
 }
 //Si la bandera no es suya y no esta cogida, la coge
 function collectFlag(player, flag){
-  if(flag.equipo.color != player.equipo.color && flag.follow == undefined){
+  if(flag.equipo.color !== player.equipo.color && flag.follow === undefined){
       
     flag.cogida = true;
     flag.follow = player;
@@ -422,13 +430,13 @@ function collectFlag(player, flag){
 
 //Si la base es suya y tiene una bandera +10 puntos
 function enterBase(player, base){
-  if(base.equipo.color == player.equipo.color && player.bandera != undefined){
+  if(base.equipo.color === player.equipo.color && player.bandera !== undefined){
       player.equipo.puntuacio += 10;
-      if(player.equipo.color == "blue") {
+      if(player.equipo.color === "blue") {
           textos.equip_blau.setText(player.equipo.puntuacio);
           if (player.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
       }
-      else if(player.equipo.color == "orange") {
+      else if(player.equipo.color === "orange") {
           textos.equip_taronja.setText(player.equipo.puntuacio);
           if (player.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
       }

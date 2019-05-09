@@ -25,6 +25,9 @@ import pw2 from '@/game/assets/pw2.png';
 import pw3 from '@/game/assets/pw3.png';
 import pocket from '@/game/assets/pocket.png';
 import bombE from '@/game/assets/bombE.png';
+import auraEscut from '@/game/assets/aura_lila.png';
+import auraVelocitat from '@/game/assets/aura_verda.png';
+import auraEstela from '@/game/assets/aura_groga.png';
 
 export default class BootScene extends Scene {
     constructor() {
@@ -43,21 +46,24 @@ export default class BootScene extends Scene {
         this.load.image('creub', creub);
         this.load.image('creut', creut);
         this.load.image('forma', forma);
-        this.load.image('estela_blava', estelap1)
-        this.load.image('estela_vermella', estelap2)
-        this.load.image('flagN', flagN)
-        this.load.image('flagA', flagA)
-        this.load.image('baseA', baseA)
-        this.load.image('baseN', baseN)
-        this.load.image('pw1', pw1)
-        this.load.image('pw2', pw2)
-        this.load.image('pw3', pw3)
-        this.load.image('pwc1', pwc1)
-        this.load.image('pwc2', pwc2)
-        this.load.image('pwc3', pwc3)
-        this.load.image('pwc0', pwc0)
-        this.load.image('pocket', pocket)
-        this.load.image('bombE', bombE)
+        this.load.image('estela_blava', estelap1);
+        this.load.image('estela_vermella', estelap2);
+        this.load.image('flagN', flagN);
+        this.load.image('flagA', flagA);
+        this.load.image('baseA', baseA);
+        this.load.image('baseN', baseN);
+        this.load.image('pw1', pw1);
+        this.load.image('pw2', pw2);
+        this.load.image('pw3', pw3);
+        this.load.image('pwc1', pwc1);
+        this.load.image('pwc2', pwc2);
+        this.load.image('pwc3', pwc3);
+        this.load.image('pwc0', pwc0);
+        this.load.image('pocket', pocket);
+        this.load.image('bombE', bombE);
+        this.load.image('aura_pwc1', auraEscut);
+        this.load.image('aura_pwc2', auraVelocitat);
+        this.load.image('aura_pwc3', auraEstela);
         // this.load.audio('thud', ['assets/thud.mp3', 'assets/thud.ogg'])
     }
 
