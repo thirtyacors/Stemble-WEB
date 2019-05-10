@@ -11,7 +11,7 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
-var temps = 120;
+var temps = 60;
 var scene;
 
 var temps_inici = 3;
@@ -83,7 +83,7 @@ export default class PlayScene extends Scene {
     };
 	textos.temps.visible = false;
 
-    //Timer 
+    //Timer
     timerTemps = this.time.addEvent({
       delay: 1000,                // ms
       callback: onTemps,
@@ -189,7 +189,7 @@ export default class PlayScene extends Scene {
   }
 
   update () {
-	
+
 	if (temps_inici === 0)
 	{
 		// MAPA
@@ -353,7 +353,20 @@ function onTemps(){
 	  else if (temps === 5) textos.temps.setColor('#ff0000');
 	  textos.temps.setText(temps);
 	  if(temps <= 0) {
-		scene.scene.start('EndScene', {equip_blau: equip_blau, equip_taronja: equip_taronja});
+		if (equip_taronja.puntuacio > equip_blau.puntuacio){
+		    scene.scene.start('EndSceneTaronja', {equip_blau: equip_blau, equip_taronja: equip_taronja});
+        }
+		else if (equip_taronja.puntuacio==equip_blau.puntuacio){
+		    if (equip_taronja.kills > equip_blau.kills){
+                scene.scene.start('EndSceneTaronja', {equip_blau: equip_blau, equip_taronja: equip_taronja});
+            }
+		    else{
+                scene.scene.start('EndSceneBlau', {equip_blau: equip_blau, equip_taronja: equip_taronja});
+            }
+        }
+		else{
+            scene.scene.start('EndSceneBlau', {equip_blau: equip_blau, equip_taronja: equip_taronja});
+        }
 	  }
   }
 }
@@ -389,7 +402,7 @@ function usePower(player){
     player.aura.destroy();
     player.aura = undefined;
   }
-} 
+}
 
 function desactivarPower(player){
   if (player.velocitat > 2) player.velocitat-=2;
@@ -406,7 +419,7 @@ function die(player, collision)
 			player.powerActivat = false;
 			player.escut = false;
 			player.setTexture("bomb");
-			
+
             if (player.bandera !== undefined) {
                   player.bandera.reset();
                   player.bandera = undefined;
@@ -459,7 +472,7 @@ function treureInmune(player){
 //Si la bandera no es suya y no esta cogida, la coge
 function collectFlag(player, flag){
   if(flag.equipo.color !== player.equipo.color && flag.follow === undefined){
-      
+
     flag.cogida = true;
     flag.follow = player;
     player.bandera = flag;

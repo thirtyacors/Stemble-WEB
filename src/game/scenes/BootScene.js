@@ -29,6 +29,9 @@ import auraEscut from '@/game/assets/aura_lila.png';
 import auraVelocitat from '@/game/assets/aura_verda.png';
 import auraEstela from '@/game/assets/aura_groga.png';
 import fondo_negre from '@/game/assets/fondo_negre.png';
+import tuto from '@/game/assets/tuto.png';
+import win_jug1 from '@/game/assets/win_jug1.png';
+import win_jug2 from '@/game/assets/win_jug2.png';
 export default class BootScene extends Scene {
     constructor() {
         super({key: 'BootScene'})
@@ -65,6 +68,9 @@ export default class BootScene extends Scene {
         this.load.image('aura_pwc2', auraVelocitat);
         this.load.image('aura_pwc3', auraEstela);
 		this.load.image('fondo_negre', fondo_negre);
+        this.load.image('tuto', tuto);
+        this.load.image('win_jug1', win_jug1);
+        this.load.image('win_jug2', win_jug2);
         // this.load.audio('thud', ['assets/thud.mp3', 'assets/thud.ogg'])
     }
 
