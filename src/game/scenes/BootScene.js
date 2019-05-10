@@ -28,7 +28,7 @@ import bombE from '@/game/assets/bombE.png';
 import auraEscut from '@/game/assets/aura_lila.png';
 import auraVelocitat from '@/game/assets/aura_verda.png';
 import auraEstela from '@/game/assets/aura_groga.png';
-
+import fondo_negre from '@/game/assets/fondo_negre.png';
 export default class BootScene extends Scene {
     constructor() {
         super({key: 'BootScene'})
@@ -64,6 +64,7 @@ export default class BootScene extends Scene {
         this.load.image('aura_pwc1', auraEscut);
         this.load.image('aura_pwc2', auraVelocitat);
         this.load.image('aura_pwc3', auraEstela);
+		this.load.image('fondo_negre', fondo_negre);
         // this.load.audio('thud', ['assets/thud.mp3', 'assets/thud.ogg'])
     }
 

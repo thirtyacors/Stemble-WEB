@@ -11,8 +11,10 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
-var temps = 300;
+var temps = 120;
 var scene;
+
+var temps_inici = 3;
 
 // VARIABLES NO EDITABLES //////////////////////////////////////////////////////////////////////////
  // CONTROLS
@@ -46,6 +48,7 @@ var bonificacio;
 
  //Interficie
 var timerTemps;
+var fondo_negre;
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -55,6 +58,7 @@ export default class PlayScene extends Scene {
   create () {
     scene = this;
     this.add.image(600, 300, 'sky');
+	fondo_negre= this.add.image(600, 300, 'fondo_negre').setDepth(19);
 
     obstacles_mapa = this.physics.add.group();
     obstacles_mapa.create(600,590,'barrera');
@@ -74,8 +78,10 @@ export default class PlayScene extends Scene {
     textos = {
         equip_blau: this.add.text(1092, 480, '0').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
         equip_taronja: this.add.text(84, 71, '0').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
-        temps: this.add.text(562, 276, temps).setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1)
+        temps: this.add.text(562, 276, temps).setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
+		temps_inici: this.add.text(540, 190, temps_inici).setFontFamily('Arial').setFontSize(200).setColor('#ffffff').setInteractive().setDepth(20).setStroke('#000000', 10)
     };
+	textos.temps.visible = false;
 
     //Timer 
     timerTemps = this.time.addEvent({
@@ -88,11 +94,17 @@ export default class PlayScene extends Scene {
     // Equips
     equip_blau = {
         color: "blue",
-        puntuacio: 0
+        puntuacio: 0,
+		banderes: 0,
+		kills: 0,
+		deads: 0
     };
     equip_taronja = {
         color: "orange",
         puntuacio: 0,
+		banderes: 0,
+		kills: 0,
+		deads: 0
     };
 
     //Bases
@@ -177,154 +189,172 @@ export default class PlayScene extends Scene {
   }
 
   update () {
-
-    // MAPA
-	/*
-    for (var i = 6; i < obstacles_mapa.getChildren().length; i++)
+	
+	if (temps_inici === 0)
 	{
-      obstacles_mapa.getChildren()[i].angle += 0.5;
-	}
-	*/
+		// MAPA
+		/*
+		for (var i = 6; i < obstacles_mapa.getChildren().length; i++)
+		{
+		  obstacles_mapa.getChildren()[i].angle += 0.5;
+		}
+		*/
 
-    // JUGADORS
-    if (player1.gap_estela >= player1.max_gap) {
-        // CREEM ESTELA P1
-        if (player1.active) {
-            if (estelap1.getChildren().length < player1.maxEstela) {
-                last_estelap1.create(player1.x, player1.y, 'estela_blava').setDepth(10);
-                last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].parent = player1;
-            }
-            else {
-                last_estelap1.add(estelap1.getChildren()[0]);
-                estelap1.remove(estelap1.getChildren()[0]);
-                last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].x = player1.x;
-                last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].y = player1.y;
-            }
-            last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].rotation = player1.rotation;
+		// JUGADORS
+		if (player1.gap_estela >= player1.max_gap) {
+			// CREEM ESTELA P1
+			if (player1.active) {
+				if (estelap1.getChildren().length < player1.maxEstela) {
+					last_estelap1.create(player1.x, player1.y, 'estela_blava').setDepth(10);
+					last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].parent = player1;
+				}
+				else {
+					last_estelap1.add(estelap1.getChildren()[0]);
+					estelap1.remove(estelap1.getChildren()[0]);
+					last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].x = player1.x;
+					last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].y = player1.y;
+				}
+				last_estelap1.getChildren()[last_estelap1.getChildren().length - 1].rotation = player1.rotation;
 
-            if (last_estelap1.getChildren().length >= max_last_estela) {
-                estelap1.add(last_estelap1.getChildren()[0]);
-                last_estelap1.remove(last_estelap1.getChildren()[0]);
-            }
-        } else {
-            // borrem estela
-            if (estelap1.getChildren().length > 0) estelap1.getChildren()[0].destroy();
-            else if (last_estelap1.getChildren().length > 0) last_estelap1.getChildren()[0].destroy();
-            else {
-                player1.active = true;
-                player1.visible = true;
-                player1.velocitat = velocitat;
-                player1.maxEstela = maxEstela;
-                player1.max_gap = max_gap / player1.velocitat;
-                player1.x = player1.inici[0];
-                player1.y = player1.inici[1];
-                player1.rotation = 0;
-                posarInmune(player1);
-            }
-        }
+				if (last_estelap1.getChildren().length >= max_last_estela) {
+					estelap1.add(last_estelap1.getChildren()[0]);
+					last_estelap1.remove(last_estelap1.getChildren()[0]);
+				}
+			} else {
+				// borrem estela
+				if (estelap1.getChildren().length > 0) estelap1.getChildren()[0].destroy();
+				else if (last_estelap1.getChildren().length > 0) last_estelap1.getChildren()[0].destroy();
+				else {
+					player1.active = true;
+					player1.visible = true;
+					player1.velocitat = velocitat;
+					player1.maxEstela = maxEstela;
+					player1.max_gap = max_gap / player1.velocitat;
+					player1.x = player1.inici[0];
+					player1.y = player1.inici[1];
+					player1.rotation = 0;
+					posarInmune(player1);
+				}
+			}
 
-        player1.gap_estela = 0;
-    }
-    else
-        player1.gap_estela++;
+			player1.gap_estela = 0;
+		}
+		else
+			player1.gap_estela++;
 
-    if (player2.gap_estela >= player2.max_gap) {
-      // CREEM ESTELA P2
-	  if(player2.active)
-	  {
-		  if (estelap2.getChildren().length < player2.maxEstela) {
-              last_estelap2.create(player2.x, player2.y, 'estela_vermella').setDepth(10);
-              last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].parent = player2;
-          }
-		  else {
-			last_estelap2.add(estelap2.getChildren()[0]);
-			estelap2.remove(estelap2.getChildren()[0]);
-			last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].x = player2.x;
-			last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].y = player2.y;
-		  }
-		  last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].rotation = player2.rotation;
-
-		  if (last_estelap2.getChildren().length >= max_last_estela)
+		if (player2.gap_estela >= player2.max_gap) {
+		  // CREEM ESTELA P2
+		  if(player2.active)
 		  {
-			estelap2.add(last_estelap2.getChildren()[0]);
-			last_estelap2.remove(last_estelap2.getChildren()[0]);
+			  if (estelap2.getChildren().length < player2.maxEstela) {
+				  last_estelap2.create(player2.x, player2.y, 'estela_vermella').setDepth(10);
+				  last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].parent = player2;
+			  }
+			  else {
+				last_estelap2.add(estelap2.getChildren()[0]);
+				estelap2.remove(estelap2.getChildren()[0]);
+				last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].x = player2.x;
+				last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].y = player2.y;
+			  }
+			  last_estelap2.getChildren()[last_estelap2.getChildren().length - 1].rotation = player2.rotation;
+
+			  if (last_estelap2.getChildren().length >= max_last_estela)
+			  {
+				estelap2.add(last_estelap2.getChildren()[0]);
+				last_estelap2.remove(last_estelap2.getChildren()[0]);
+			  }
 		  }
-	  }
-	  else
-	  {
-		  // borrem estela
-		  if (estelap2.getChildren().length > 0) estelap2.getChildren()[0].destroy();
-		  else if (last_estelap2.getChildren().length > 0) last_estelap2.getChildren()[0].destroy();
 		  else
 		  {
-				player2.active = true;
-				player2.visible = true;
-				player2.velocitat = velocitat;
-                player2.maxEstela = maxEstela;
-                player2.max_gap = max_gap / player2.velocitat;
-				player2.x = player2.inici[0];
-				player2.y = player2.inici[1];
-                player2.rotation = Math.PI;
-                posarInmune(player2);
+			  // borrem estela
+			  if (estelap2.getChildren().length > 0) estelap2.getChildren()[0].destroy();
+			  else if (last_estelap2.getChildren().length > 0) last_estelap2.getChildren()[0].destroy();
+			  else
+			  {
+					player2.active = true;
+					player2.visible = true;
+					player2.velocitat = velocitat;
+					player2.maxEstela = maxEstela;
+					player2.max_gap = max_gap / player2.velocitat;
+					player2.x = player2.inici[0];
+					player2.y = player2.inici[1];
+					player2.rotation = Math.PI;
+					posarInmune(player2);
+			  }
 		  }
-	  }
-        player2.gap_estela = 0;
-    }
-    else
-        player2.gap_estela++;
+			player2.gap_estela = 0;
+		}
+		else
+			player2.gap_estela++;
 
-  // APLICAR MOVIMENT AUTOMATIC
-    // CONTROLS player1
-    if (keys.left.isDown)
-      player1.rotation -= rotacio;
-    else if (keys.right.isDown)
-      player1.rotation += rotacio;
+	  // APLICAR MOVIMENT AUTOMATIC
+		// CONTROLS player1
+		if (keys.left.isDown)
+		  player1.rotation -= rotacio;
+		else if (keys.right.isDown)
+		  player1.rotation += rotacio;
 
-    if(keys.left.isDown)
-      usePower(player1);
+		if(keys.up.isDown)
+		  usePower(player1);
 
-    // CONTROLS player2
-    if (keys.a.isDown)
-      player2.rotation -= rotacio;
-    else if (keys.d.isDown)
-      player2.rotation += rotacio;
+		// CONTROLS player2
+		if (keys.a.isDown)
+		  player2.rotation -= rotacio;
+		else if (keys.d.isDown)
+		  player2.rotation += rotacio;
 
-    if(keys.w.isDown)
-      usePower(player2);
+		if(keys.w.isDown)
+		  usePower(player2);
 
-    // Calcular desplaçament player1
-    player1.x += player1.velocitat * Math.sin(-player1.rotation);
-    player1.y += player1.velocitat * Math.cos(-player1.rotation);
-    if (player1.aura !== undefined)
-    {
-        player1.aura.x = player1.x;
-        player1.aura.y = player1.y;
-    }
-    // Calcular desplaçament player2
-    player2.x += player2.velocitat * Math.sin(-player2.rotation);
-    player2.y += player2.velocitat * Math.cos(-player2.rotation);
-    if (player2.aura !== undefined)
-    {
-        player2.aura.x = player2.x;
-        player2.aura.y = player2.y;
-    }
+		// Calcular desplaçament player1
+		player1.x += player1.velocitat * Math.sin(-player1.rotation);
+		player1.y += player1.velocitat * Math.cos(-player1.rotation);
+		if (player1.aura !== undefined)
+		{
+			player1.aura.x = player1.x;
+			player1.aura.y = player1.y;
+		}
+		// Calcular desplaçament player2
+		player2.x += player2.velocitat * Math.sin(-player2.rotation);
+		player2.y += player2.velocitat * Math.cos(-player2.rotation);
+		if (player2.aura !== undefined)
+		{
+			player2.aura.x = player2.x;
+			player2.aura.y = player2.y;
+		}
 
-    //Moviment banderes
-    flag.children.iterate(function (child) {
-      if(child.follow !== undefined){
-        child.x = child.follow.x+10;
-        child.y = child.follow.y-20;
-        child.refreshBody();
-      }
-    });
-  }
+		//Moviment banderes
+		flag.children.iterate(function (child) {
+		  if(child.follow !== undefined){
+			child.x = child.follow.x+10;
+			child.y = child.follow.y-20;
+			child.refreshBody();
+		  }
+		});
+	  } // FI IF (temps_inici === 0)
+	} // FI UPDATE
 }
 
 function onTemps(){
-  temps--;
-  textos.temps.setText(temps);
-  if(temps <= 0) {
-    scene.scene.start('EndScene')
+  if (temps_inici > 0) {
+	  temps_inici --;
+	  textos.temps_inici.setText(temps_inici);
+	  if (temps_inici===0){
+		  textos.temps_inici.destroy();
+		  fondo_negre.destroy();
+		  textos.temps.visible = true;
+		  textos.temps_inici = undefined;
+	  }
+  }
+  else {
+	  temps--;
+	  if (temps === 99) textos.temps.x = 575;
+	  else if (temps === 9) textos.temps.x = 588;
+	  else if (temps === 5) textos.temps.setColor('#ff0000');
+	  textos.temps.setText(temps);
+	  if(temps <= 0) {
+		scene.scene.start('EndScene', {equip_blau: equip_blau, equip_taronja: equip_taronja});
+	  }
   }
 }
 
@@ -366,39 +396,46 @@ function desactivarPower(player){
   player.powerActivat = false;
 }
 
+// MORIR
 function die(player, collision)
 {
     if (player.active)
 	{
         if(!player.escut && !player.inmune || !collision.parent)
         {
-          player.powerActivat = false;
+			player.powerActivat = false;
+			player.escut = false;
+			player.setTexture("bomb");
+			
             if (player.bandera !== undefined) {
                   player.bandera.reset();
                   player.bandera = undefined;
             }
-          player.power = undefined;
-          //player.socket.setTexture('pwc0');
-          if (player.aura !== undefined)
-          {
-              player.aura.destroy();
-              player.aura = undefined;
-          }
-          player.active = false;
-          player.visible = false;
-          player.velocitat = 0;
+			player.power = undefined;
 
-          // SUMAR PUNTUACIO
-              if (collision.parent && collision.parent.equipo !== player.equipo) {console.log(collision.parent.equipo);
-                  collision.parent.equipo.puntuacio += 1;
-                  if (collision.parent.equipo.color === "blue") {
-                      textos.equip_blau.setText(collision.parent.equipo.puntuacio);
-                      if (collision.parent.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
-                  } else if (collision.parent.equipo.color === "orange") {
-                      textos.equip_taronja.setText(collision.parent.equipo.puntuacio);
-                      if (collision.parent.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
-                  }
-              }
+			if (player.aura !== undefined)
+			{
+			  player.aura.destroy();
+			  player.aura = undefined;
+			}
+
+			player.equipo.deads += 1;
+			player.active = false;
+			player.visible = false;
+			player.velocitat = 0;
+
+			// SUMAR PUNTUACIO
+			if (collision.parent && collision.parent.equipo !== player.equipo) {console.log(collision.parent.equipo);
+			  collision.parent.equipo.puntuacio += 1;
+			  collision.parent.equipo.kills += 1;
+			  if (collision.parent.equipo.color === "blue") {
+				  textos.equip_blau.setText(collision.parent.equipo.puntuacio);
+				  if (collision.parent.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
+			  } else if (collision.parent.equipo.color === "orange") {
+				  textos.equip_taronja.setText(collision.parent.equipo.puntuacio);
+				  if (collision.parent.equipo.puntuacio > 9) textos.equip_taronja.x = 72;
+			  }
+			}
         }
         else
         {
@@ -418,6 +455,7 @@ function posarInmune(player){
 function treureInmune(player){
   player.inmune = false;
 }
+
 //Si la bandera no es suya y no esta cogida, la coge
 function collectFlag(player, flag){
   if(flag.equipo.color !== player.equipo.color && flag.follow === undefined){
@@ -432,6 +470,7 @@ function collectFlag(player, flag){
 function enterBase(player, base){
   if(base.equipo.color === player.equipo.color && player.bandera !== undefined){
       player.equipo.puntuacio += 10;
+	  player.equipo.banderes += 1;
       if(player.equipo.color === "blue") {
           textos.equip_blau.setText(player.equipo.puntuacio);
           if (player.equipo.puntuacio > 9) textos.equip_blau.x = 1080;
@@ -446,6 +485,7 @@ function enterBase(player, base){
 
   }
 }
+
 //Inicialitza els atributs de la bandera
 function inicialitzarFlag(flag){
     flag.posInicialX = flag.x;
