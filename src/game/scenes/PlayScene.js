@@ -11,10 +11,13 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
-var temps = 60;
+var temps = 120;
 var scene;
 
 var temps_inici = 3;
+
+//PowerUPs
+var max_gap_PowerUP = 20;
 
 // VARIABLES NO EDITABLES //////////////////////////////////////////////////////////////////////////
  // CONTROLS
@@ -45,6 +48,8 @@ var textos;
 
  //PowerUPs
 var bonificacio;
+var rectSpawn;
+var gap_PowerUP = 0;
 
  //Interficie
 var timerTemps;
@@ -74,6 +79,8 @@ export default class PlayScene extends Scene {
     obstacles_mapa.create(396, 157, 'creut');
     obstacles_mapa.create(300, 157, 'creut');
     obstacles_mapa.create(600, 300, 'forma');
+
+    rectSpawn = new Phaser.Geom.Rectangle(350, 50, 500, 500);
 
     textos = {
         equip_blau: this.add.text(1092, 480, '0').setFontFamily('Arial').setFontSize(45).setColor('#ffff00').setInteractive().setDepth(1),
@@ -181,9 +188,11 @@ export default class PlayScene extends Scene {
 
     //PowerUps
     bonificacio = this.physics.add.staticGroup();
+    /*
     bonificacio.create(400,450,'pw1').setScale(0.03).refreshBody().text = "pwc1"; //Escut
     bonificacio.create(300,350,'pw2').setScale(0.03).refreshBody().text = "pwc2"; //Velocitat
     bonificacio.create(500,350,'pw3').setScale(0.03).refreshBody().text = "pwc3"; //Estela
+    */
 
     this.physics.add.overlap([player1,player2], bonificacio ,getPower, null, this);
   }
@@ -356,7 +365,7 @@ function onTemps(){
 		if (equip_taronja.puntuacio > equip_blau.puntuacio){
 		    scene.scene.start('EndSceneTaronja', {equip_blau: equip_blau, equip_taronja: equip_taronja});
         }
-		else if (equip_taronja.puntuacio==equip_blau.puntuacio){
+		else if (equip_taronja.puntuacio===equip_blau.puntuacio){
 		    if (equip_taronja.kills > equip_blau.kills){
                 scene.scene.start('EndSceneTaronja', {equip_blau: equip_blau, equip_taronja: equip_taronja});
             }
@@ -368,6 +377,22 @@ function onTemps(){
             scene.scene.start('EndSceneBlau', {equip_blau: equip_blau, equip_taronja: equip_taronja});
         }
 	  }
+
+	    // PowerUPs
+      if(gap_PowerUP >= max_gap_PowerUP)
+      {
+          var rand = Math.round(Math.random() * 3);
+          var pos = rectSpawn.getRandomPoint();
+          if (rand === 0)
+              bonificacio.create(pos.x,pos.y,'pw1').setScale(0.03).refreshBody().text = "pwc1"; //Escut
+          else if (rand === 1)
+              bonificacio.create(pos.x,pos.y,'pw2').setScale(0.03).refreshBody().text = "pwc2"; //Velocitat
+          else
+              bonificacio.create(pos.x,pos.y,'pw3').setScale(0.03).refreshBody().text = "pwc3"; //Estela
+
+          gap_PowerUP = 0;
+      }
+      else gap_PowerUP ++;
   }
 }
 
@@ -438,7 +463,7 @@ function die(player, collision)
 			player.velocitat = 0;
 
 			// SUMAR PUNTUACIO
-			if (collision.parent && collision.parent.equipo !== player.equipo) {console.log(collision.parent.equipo);
+			if (collision.parent && collision.parent.equipo !== player.equipo) {
 			  collision.parent.equipo.puntuacio += 1;
 			  collision.parent.equipo.kills += 1;
 			  if (collision.parent.equipo.color === "blue") {
