@@ -11,13 +11,13 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
-var temps = 35;
+var temps = 2;
 var scene;
 
 var temps_inici = 3;
 
 //PowerUPs
-var max_gap_PowerUP = 20;
+var max_gap_PowerUP = 1;
 
 // VARIABLES NO EDITABLES //////////////////////////////////////////////////////////////////////////
  // CONTROLS
@@ -119,8 +119,13 @@ export default class PlayScene extends Scene {
     base.create( posInicialJug2[0], posInicialJug2[1],'baseN').setScale(0.5).refreshBody().equipo = equip_taronja;
     base.create( posInicialJug1[0], posInicialJug1[1],'baseA').setScale(0.5).refreshBody().equipo = equip_blau;
 
+    var base1 = base.getChildren()[0];
+    base1.visible = false;
+    var base2 = base.getChildren()[1];
+    base2.visible = false;
+  
     //Jugadors
-    player1 = this.physics.add.sprite( posInicialJug1[0],  posInicialJug1[1], 'bomb');
+    player1 = this.physics.add.sprite( posInicialJug1[0],  posInicialJug1[1], 'jugadorB');
     player1.setCollideWorldBounds(true).body.onWorldBounds = true;
     player1.inici = posInicialJug1;
     player1.depth = 11;
@@ -133,7 +138,7 @@ export default class PlayScene extends Scene {
     player1.bandera = undefined;
     player1.power = undefined;
 
-    player2 = this.physics.add.sprite( posInicialJug2[0],  posInicialJug2[1], 'bomb');
+    player2 = this.physics.add.sprite( posInicialJug2[0],  posInicialJug2[1], 'jugadorT');
     player2.setCollideWorldBounds(true).body.onWorldBounds = true;
     player2.inici = posInicialJug2;
     player2.depth = 11;
@@ -171,8 +176,8 @@ export default class PlayScene extends Scene {
 
     //Banderas
     flag = this.physics.add.staticGroup();
-    flag.create(posInicialJug2[0]+10, posInicialJug2[1]-50,'flagN').setScale(0.03).refreshBody().equipo = equip_taronja;
-    flag.create(posInicialJug1[0]+10, posInicialJug1[1]-50,'flagA').setScale(0.03).refreshBody().equipo = equip_blau;
+    flag.create(posInicialJug2[0]+10, posInicialJug2[1]-50,'flagN').setScale(1.5).refreshBody().equipo = equip_taronja;
+    flag.create(posInicialJug1[0]+10, posInicialJug1[1]-50,'flagA').setScale(1.5).refreshBody().equipo = equip_blau;
 
     //Iniciar banderas
     var flag1 = flag.getChildren()[0];
@@ -362,7 +367,7 @@ function onTemps(){
 	  else if (temps === 5) textos.temps.setColor('#ff0000');
 	  textos.temps.setText(temps);
 	  if(temps <= 0) {
-		    scene.scene.start('EndSceneBlau', {equip_blau: equip_blau, equip_taronja: equip_taronja});
+		    scene.scene.start('EndScene', {equip_blau: equip_blau, equip_taronja: equip_taronja});
 	  }
 
 	    // PowerUPs
@@ -371,11 +376,11 @@ function onTemps(){
           var rand = Math.round(Math.random() * 3);
           var pos = rectSpawn.getRandomPoint();
           if (rand === 0)
-              bonificacio.create(pos.x,pos.y,'pw1').setScale(0.03).refreshBody().text = "pwc1"; //Escut
+              bonificacio.create(pos.x,pos.y,'pwc1').setScale(0.7).refreshBody().text = "pwc1"; //Escut
           else if (rand === 1)
-              bonificacio.create(pos.x,pos.y,'pw2').setScale(0.03).refreshBody().text = "pwc2"; //Velocitat
+              bonificacio.create(pos.x,pos.y,'pwc2').setScale(0.7).refreshBody().text = "pwc2"; //Velocitat
           else
-              bonificacio.create(pos.x,pos.y,'pw3').setScale(0.03).refreshBody().text = "pwc3"; //Estela
+              bonificacio.create(pos.x,pos.y,'pwc3').setScale(0.7).refreshBody().text = "pwc3"; //Estela
 
           gap_PowerUP = 0;
       }
@@ -397,7 +402,14 @@ function usePower(player){
     switch(player.power){
       case "pwc1":
         player.escut = true;
-        player.setTexture("bombE");
+        if(player.equipo === equip_taronja)
+        {
+          player.setTexture("jugadorTE");
+        }
+        else
+        {
+          player.setTexture("jugadorBE");
+        }
         player.powerActivat = true;
         break;
       case "pwc2":
@@ -429,8 +441,15 @@ function die(player, collision)
         if(!player.escut && !player.inmune || !collision.parent)
         {
 			player.powerActivat = false;
-			player.escut = false;
-			player.setTexture("bomb");
+      player.escut = false;
+      if(player.equipo === equip_taronja){
+          player.setTexture("jugadorT");
+
+      }
+      else
+      {
+          player.setTexture("jugadorB");
+      }
 
             if (player.bandera !== undefined) {
                   player.bandera.reset();
@@ -465,7 +484,14 @@ function die(player, collision)
         else
         {
           player.escut = false;
-          player.setTexture("bomb");
+          if(player.equipo === equip_taronja){
+            player.setTexture("jugadorT");
+  
+          }
+          else
+          {
+              player.setTexture("jugadorB");
+          }
           player.powerActivat = false;
           posarInmune(player);
         }
