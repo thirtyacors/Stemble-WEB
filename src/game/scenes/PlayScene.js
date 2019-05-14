@@ -11,7 +11,7 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
-var temps = 120;
+var temps = 35;
 var scene;
 
 var temps_inici = 3;
@@ -362,20 +362,7 @@ function onTemps(){
 	  else if (temps === 5) textos.temps.setColor('#ff0000');
 	  textos.temps.setText(temps);
 	  if(temps <= 0) {
-		if (equip_taronja.puntuacio > equip_blau.puntuacio){
-		    scene.scene.start('EndSceneTaronja', {equip_blau: equip_blau, equip_taronja: equip_taronja});
-        }
-		else if (equip_taronja.puntuacio===equip_blau.puntuacio){
-		    if (equip_taronja.kills > equip_blau.kills){
-                scene.scene.start('EndSceneTaronja', {equip_blau: equip_blau, equip_taronja: equip_taronja});
-            }
-		    else{
-                scene.scene.start('EndSceneBlau', {equip_blau: equip_blau, equip_taronja: equip_taronja});
-            }
-        }
-		else{
-            scene.scene.start('EndSceneBlau', {equip_blau: equip_blau, equip_taronja: equip_taronja});
-        }
+		    scene.scene.start('EndSceneBlau', {equip_blau: equip_blau, equip_taronja: equip_taronja});
 	  }
 
 	    // PowerUPs

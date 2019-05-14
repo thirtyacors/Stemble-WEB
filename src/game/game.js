@@ -1,8 +1,7 @@
 import Phaser from 'phaser'
 import BootScene from './scenes/BootScene'
 import PlayScene from './scenes/PlayScene'
-import EndSceneTaronja from './scenes/EndSceneTaronja'
-import EndSceneBlau from './scenes/EndSceneBlau'
+import EndScene from './scenes/EndScene'
 
 function launch() {
     new Phaser.Game({
@@ -17,7 +16,7 @@ function launch() {
                 debug: false
             }
         },
-        scene: [BootScene, PlayScene, EndSceneBlau, EndSceneTaronja]
+        scene: [BootScene, PlayScene, EndScene]
     })
 }
 
