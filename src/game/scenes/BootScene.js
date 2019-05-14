@@ -30,6 +30,9 @@ import auraEstela from '@/game/assets/aura_groga.png';
 import fondo_negre from '@/game/assets/fondo_negre.png';
 import tuto from '@/game/assets/tuto.png';
 import background from '@/game/assets/background.png';
+import fletxa_negra from '@/game/assets/fletxa_negra.png';
+import fletxa_blanca from '@/game/assets/fletxa_blanca.png';
+
 export default class BootScene extends Scene {
     constructor() {
         super({key: 'BootScene'})
@@ -59,7 +62,6 @@ export default class BootScene extends Scene {
         this.load.image('aura_pwc2', auraVelocitat);
         this.load.image('aura_pwc3', auraEstela);
 		this.load.image('fondo_negre', fondo_negre);
-        this.load.image('tuto', tuto);
         this.load.image('win_jug1', win_jug1);
         this.load.image('win_jug2', win_jug2);
         this.load.image('jugadorB', jugadorB);
@@ -67,23 +69,56 @@ export default class BootScene extends Scene {
         this.load.image('jugadorBE', jugadorBE);
         this.load.image('jugadorTE', jugadorTE);
         this.load.image('background', background);
+        this.load.image('tuto', tuto);
+        this.load.image('fletxa_negra', fletxa_negra);
+        this.load.image('fletxa_blanca', fletxa_blanca);
         // this.load.audio('thud', ['assets/thud.mp3', 'assets/thud.ogg'])
     }
 
     create() {
-
+        var fletxa_blanca, fletxa_negra, tuto;
         this.add.image(300,300,"background");
+        tuto = this.add.image(600, 300, 'tuto').setDepth(2);
+        tuto.visible = false;
+        fletxa_blanca = this.add.image(50, 40, 'fletxa_blanca').setScale(0.1).setInteractive().setDepth(3)
+        .on('pointerdown', () => {
+            tuto.visible = false;
+            fletxa_negra.visible = fletxa_blanca.visible = false;
+            fletxa_negra.active = fletxa_blanca.active = false;
+            txtFinal.active = true;
+            txtFinal2.active = true;
+        } )
+        .on('pointerout', () => {
+            if (fletxa_negra.active && fletxa_blanca.active) {
+                fletxa_blanca.visible = false;
+                fletxa_negra.visible = true;
+            }
+        });
+        fletxa_blanca.visible = false;
+        fletxa_negra = this.add.image(50, 40, 'fletxa_negra').setScale(0.1).setInteractive().setDepth(3)
+        .on('pointerover', () => {
+            if (fletxa_negra.active && fletxa_blanca.active) {
+                fletxa_negra.visible = false;
+                fletxa_blanca.visible = true;
+            }
+        } );
+        fletxa_negra.visible = false;
 
         var txtFinal = this.add.text(500, 450, "Jugar").setFontFamily('Arial').setFontSize(24).setColor('#FFFFFF').setInteractive().setDepth(1)
-        .on('pointerdown', () => {this.scene.start('PlayScene')} )
+        .on('pointerdown', () => {if (txtFinal.active) this.scene.start('PlayScene')} )
         .on('pointerover', () => {txtFinal.setColor("#FF0000")} )
         .on('pointerout', () => {txtFinal.setColor("#FFFFFF")});
 
         var txtFinal2 = this.add.text(500, 500, "Tutorial").setFontFamily('Arial').setFontSize(24).setColor('#FFFFFF').setInteractive().setDepth(1)
-        .on('pointerdown', () => {this.scene.start('PlayScene')} )
+        .on('pointerdown', () => {
+            fletxa_negra.active = fletxa_blanca.active = true;
+            tuto.visible = true;
+            fletxa_negra.visible = true;
+            txtFinal.active = false;
+            txtFinal2.active = false;
+        } )
         .on('pointerover', () => {txtFinal2.setColor("#FF0000")} )
         .on('pointerout', () => {txtFinal2.setColor("#FFFFFF")});
 
-        
     }
 }

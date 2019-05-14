@@ -11,7 +11,7 @@ var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor
 var posInicialJug1 = [1105, 95]; // pos inicial player1
 var posInicialJug2 = [95, 505]; // pos inicial player2
 
-var temps = 2;
+var temps = 30;
 var scene;
 
 var temps_inici = 3;
