@@ -77,7 +77,7 @@ export default class BootScene extends Scene {
 
     create() {
         var fletxa_blanca, fletxa_negra, tuto;
-        this.add.image(300,300,"background");
+        this.add.image(600,300,"background");
         tuto = this.add.image(600, 300, 'tuto').setDepth(2);
         tuto.visible = false;
         fletxa_blanca = this.add.image(50, 40, 'fletxa_blanca').setScale(0.1).setInteractive().setDepth(3)
@@ -104,12 +104,12 @@ export default class BootScene extends Scene {
         } );
         fletxa_negra.visible = false;
 
-        var txtFinal = this.add.text(500, 450, "Jugar").setFontFamily('Arial').setFontSize(24).setColor('#FFFFFF').setInteractive().setDepth(1)
+        var txtFinal = this.add.text(588, 164, "Jugar").setFontFamily('Arial').setFontSize(24).setColor('#FFFFFF').setInteractive().setDepth(1)
         .on('pointerdown', () => {if (txtFinal.active) this.scene.start('PlayScene')} )
-        .on('pointerover', () => {txtFinal.setColor("#FF0000")} )
+        .on('pointerover', () => {txtFinal.setColor("#f96909")} )
         .on('pointerout', () => {txtFinal.setColor("#FFFFFF")});
 
-        var txtFinal2 = this.add.text(500, 500, "Tutorial").setFontFamily('Arial').setFontSize(24).setColor('#FFFFFF').setInteractive().setDepth(1)
+        var txtFinal2 = this.add.text(560, 423, "Tutorial").setFontFamily('Arial').setFontSize(24).setColor('#FFFFFF').setInteractive().setDepth(1)
         .on('pointerdown', () => {
             fletxa_negra.active = fletxa_blanca.active = true;
             tuto.visible = true;
@@ -117,7 +117,7 @@ export default class BootScene extends Scene {
             txtFinal.active = false;
             txtFinal2.active = false;
         } )
-        .on('pointerover', () => {txtFinal2.setColor("#FF0000")} )
+        .on('pointerover', () => {txtFinal2.setColor("#29759b")} )
         .on('pointerout', () => {txtFinal2.setColor("#FFFFFF")});
 
     }
