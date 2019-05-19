@@ -105,7 +105,11 @@ export default class BootScene extends Scene {
         fletxa_negra.visible = false;
 
         var txtFinal = this.add.text(588, 164, "Jugar").setFontFamily('Arial').setFontSize(24).setColor('#FFFFFF').setInteractive().setDepth(1)
-        .on('pointerdown', () => {if (txtFinal.active) this.scene.start('PlayScene')} )
+        .on('pointerdown', () => {
+            if (txtFinal.active) {
+                this.scene.start('PlayScene');
+            }
+        } )
         .on('pointerover', () => {txtFinal.setColor("#f96909")} )
         .on('pointerout', () => {txtFinal.setColor("#FFFFFF")});
 

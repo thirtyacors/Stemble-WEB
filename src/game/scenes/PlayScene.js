@@ -1,23 +1,22 @@
 import { Scene } from 'phaser';
 
-// VARIABLES EDITABLES //////////////////////////////////////////////////////////////////////////
-var velocitat = 2; // velocitat players
-var rotacio = 0.05; // rotacio players
+// VARIABLES EDITABLES (EDITAR VARIABLES ES FA AL CREATE)//////////////////////////////////////////////////////////////////////////
+var velocitat; // velocitat players
+var rotacio; // rotacio players
 
-var max_last_estela = 5; // esteles que no toquen el player
-var maxEstela = 20 - max_last_estela; // maxim nombre de esteles
-var max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor entre velocitat)
+var max_last_estela; // esteles que no toquen el player
+var maxEstela; // maxim nombre de esteles
+var max_gap; // cada quan surten les esteles (cada jugador té aquest valor entre velocitat)
 
-var posInicialJug1 = [1105, 95]; // pos inicial player1
-var posInicialJug2 = [95, 505]; // pos inicial player2
+var posInicialJug1; // pos inicial player1
+var posInicialJug2; // pos inicial player2
 
-var temps = 100;
-var scene;
+var temps;
 
-var temps_inici = 3;
+var temps_inici;
 
 //PowerUPs
-var max_gap_PowerUP = 10;
+var max_gap_PowerUP;
 
 // VARIABLES NO EDITABLES //////////////////////////////////////////////////////////////////////////
  // CONTROLS
@@ -54,6 +53,7 @@ var gap_PowerUP = 0;
  //Interficie
 var timerTemps;
 var fondo_negre;
+var scene;
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -61,6 +61,25 @@ export default class PlayScene extends Scene {
   }
 
   create () {
+    // VARIABLES EDITABLES //////////////////////////////////////////////////////////////////////////
+    velocitat = 2; // velocitat players
+    rotacio = 0.05; // rotacio players
+
+    max_last_estela = 5; // esteles que no toquen el player
+    maxEstela = 20 - max_last_estela; // maxim nombre de esteles
+    max_gap = 10; // cada quan surten les esteles (cada jugador té aquest valor entre velocitat)
+
+    posInicialJug1 = [1105, 95]; // pos inicial player1
+    posInicialJug2 = [95, 505]; // pos inicial player2
+
+    temps = 100;
+
+    temps_inici = 3;
+
+    //PowerUPs
+    max_gap_PowerUP = 10;
+
+    // CREATE
     scene = this;
     this.add.image(600, 300, 'sky');
 	fondo_negre= this.add.image(600, 300, 'fondo_negre').setDepth(19);
